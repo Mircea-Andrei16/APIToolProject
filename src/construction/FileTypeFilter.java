@@ -1,5 +1,9 @@
+/**
+ * Is a class for selecting the files that we want to extract from the disk
+ * Is used with the JFileChooser
+ */
 package construction;
-//this class is helpful for the JFileChooser to choose just a the types of files that are wanted 
+
 import java.io.File;
 import javax.swing.filechooser.FileFilter;
  

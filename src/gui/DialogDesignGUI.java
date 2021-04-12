@@ -1,3 +1,6 @@
+/**
+ * GUI for this project. Creates a Dialog for the project
+ */
 package gui;
 
 import java.awt.BorderLayout;
@@ -15,6 +18,8 @@ import construction.Resources;
 
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.GridBagConstraints;
 import javax.swing.JTextField;
 import java.awt.Insets;
@@ -23,6 +28,9 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.Files;
 
 import javax.swing.JRadioButton;
 import javax.swing.JComboBox;
@@ -31,15 +39,28 @@ import javax.swing.DefaultComboBoxModel;
 
 public class DialogDesignGUI extends JDialog {
 
+// **************************************************
+// Fields
+// **************************************************
+
 	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField inputTextField;
 	private JTextField outputTextField;
+	private String outputFileAbsolutePath;
+
+// **************************************************
+// Public method
+// **************************************************
 
 	/**
-	 * Create the dialog.
+	 * /** Create the dialog with the specific buttons
+	 * 
+	 * @param displays on the screen at the specific rectangle of the screen the
+	 *                 Dialog
 	 */
 	public DialogDesignGUI() {
+
 		// set the frame of the of the dialog
 		setBounds(100, 100, 550, 400);
 		setTitle("Open APIChecker");
@@ -47,6 +68,7 @@ public class DialogDesignGUI extends JDialog {
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
 		GridBagLayout gridBagLayoutContentPanel = new GridBagLayout();
+
 		// creates the rows and columns for the GridBagLayout
 		gridBagLayoutContentPanel.columnWidths = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 		gridBagLayoutContentPanel.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -54,12 +76,11 @@ public class DialogDesignGUI extends JDialog {
 				Double.MIN_VALUE };
 		gridBagLayoutContentPanel.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 				Double.MIN_VALUE };
-		Resources resources = new Resources();
 
 		contentPanel.setLayout(gridBagLayoutContentPanel);
 
 		// creates the openAPI label of the dialog
-		JLabel openAPILabel = new JLabel(resources.getLabel("openApiLabel"));
+		JLabel openAPILabel = new JLabel(Resources.INPUT_URL_LABEL);
 		GridBagConstraints gridConstOpenAPILabel = new GridBagConstraints();
 		gridConstOpenAPILabel.insets = new Insets(0, 0, 5, 5);
 		gridConstOpenAPILabel.anchor = GridBagConstraints.WEST;
@@ -79,7 +100,7 @@ public class DialogDesignGUI extends JDialog {
 		inputTextField.setColumns(20);
 
 		// creates the input browse button
-		JButton inputBrowseButton = new JButton("Browse");
+		JButton inputBrowseButton = new JButton(Resources.BROWSE_BUTTONS);
 		addFunctionalityInputBrowseButton(inputBrowseButton, inputTextField);
 		GridBagConstraints gridBConstInputBrowseButton = new GridBagConstraints();
 		gridBConstInputBrowseButton.insets = new Insets(0, 0, 5, 5);
@@ -88,7 +109,7 @@ public class DialogDesignGUI extends JDialog {
 		contentPanel.add(inputBrowseButton, gridBConstInputBrowseButton);
 
 		// creates the services label of the dialog
-		JLabel servicesLabel = new JLabel(resources.getLabel("servicesLabel"));
+		JLabel servicesLabel = new JLabel(Resources.SERVICES_LABEL);
 		GridBagConstraints gridBConstServicesLabel = new GridBagConstraints();
 		gridBConstServicesLabel.anchor = GridBagConstraints.WEST;
 		gridBConstServicesLabel.insets = new Insets(0, 0, 5, 5);
@@ -97,7 +118,7 @@ public class DialogDesignGUI extends JDialog {
 		contentPanel.add(servicesLabel, gridBConstServicesLabel);
 
 		// creates and inserts the radio buttons in the dialog
-		JRadioButton currencyRadioButton = new JRadioButton("currency");
+		JRadioButton currencyRadioButton = new JRadioButton(Resources.CURRENCY_BUTTON_LABEL);
 		GridBagConstraints gridBConstCurrencyRadioButton = new GridBagConstraints();
 		gridBConstCurrencyRadioButton.anchor = GridBagConstraints.EAST;
 		gridBConstCurrencyRadioButton.insets = new Insets(0, 0, 5, 5);
@@ -105,7 +126,7 @@ public class DialogDesignGUI extends JDialog {
 		gridBConstCurrencyRadioButton.gridy = 2;
 		contentPanel.add(currencyRadioButton, gridBConstCurrencyRadioButton);
 
-		JRadioButton testRadioButton = new JRadioButton("test");
+		JRadioButton testRadioButton = new JRadioButton(Resources.TEST_BUTTON_LABEL);
 		GridBagConstraints gridBConstTestRadioButton = new GridBagConstraints();
 		gridBConstTestRadioButton.insets = new Insets(0, 0, 5, 5);
 		gridBConstTestRadioButton.gridx = 2;
@@ -118,7 +139,7 @@ public class DialogDesignGUI extends JDialog {
 		buttonGroup.add(testRadioButton);
 
 		// creates and inserts the port label
-		JLabel portsLabel = new JLabel(resources.getLabel("portsLabel"));
+		JLabel portsLabel = new JLabel(Resources.PORTS_LABEL);
 		GridBagConstraints gridBConstPortsLabel = new GridBagConstraints();
 		gridBConstPortsLabel.anchor = GridBagConstraints.WEST;
 		gridBConstPortsLabel.insets = new Insets(0, 0, 5, 5);
@@ -137,7 +158,7 @@ public class DialogDesignGUI extends JDialog {
 		contentPanel.add(portsComboBox, gridBConstPortsComboBox);
 
 		// creates and inserts the operations label
-		JLabel operationsLabel = new JLabel(resources.getLabel("operationsLabel"));
+		JLabel operationsLabel = new JLabel(Resources.OPERATIONS_LABEL);
 		GridBagConstraints gridBConstOperationsLabel = new GridBagConstraints();
 		gridBConstOperationsLabel.anchor = GridBagConstraints.WEST;
 		gridBConstOperationsLabel.insets = new Insets(0, 0, 5, 5);
@@ -158,7 +179,7 @@ public class DialogDesignGUI extends JDialog {
 		contentPanel.add(operationsComboBox, gridBConstOperationsComboBox);
 
 		// creates and inserts in the dialog the only required content check box
-		JCheckBox onlyRequiredContentCheckBox = new JCheckBox("Only Required Content");
+		JCheckBox onlyRequiredContentCheckBox = new JCheckBox(Resources.CHECKBOX_ONLY_REQUIRED_CONTENT_NAME);
 		GridBagConstraints gridBConstORCCheckBox = new GridBagConstraints();
 		gridBConstORCCheckBox.insets = new Insets(0, 0, 5, 5);
 		gridBConstORCCheckBox.gridx = 0;
@@ -166,7 +187,7 @@ public class DialogDesignGUI extends JDialog {
 		contentPanel.add(onlyRequiredContentCheckBox, gridBConstORCCheckBox);
 
 		// creates and inserts in the dialog the include examples check box
-		JCheckBox includeExamplesCheckBox = new JCheckBox("Include Examples");
+		JCheckBox includeExamplesCheckBox = new JCheckBox(Resources.CHECKBOX_INCLUDE_EXAMPLES);
 		GridBagConstraints gridBConstIECheckBox = new GridBagConstraints();
 		gridBConstIECheckBox.anchor = GridBagConstraints.WEST;
 		gridBConstIECheckBox.insets = new Insets(0, 0, 5, 5);
@@ -175,7 +196,7 @@ public class DialogDesignGUI extends JDialog {
 		contentPanel.add(includeExamplesCheckBox, gridBConstIECheckBox);
 
 		// creates and inserts the output file label
-		JLabel outputFileLabel = new JLabel(resources.getLabel("outputFileLabel"));
+		JLabel outputFileLabel = new JLabel(Resources.OUTPUT_FILE_LABEL);
 		GridBagConstraints gridBConstOutputFileLabel = new GridBagConstraints();
 		gridBConstOutputFileLabel.anchor = GridBagConstraints.WEST;
 		gridBConstOutputFileLabel.insets = new Insets(0, 0, 0, 5);
@@ -195,7 +216,7 @@ public class DialogDesignGUI extends JDialog {
 		outputTextField.setColumns(20);
 
 		// output browse button
-		JButton outputBrowseButton = new JButton("Browse");
+		JButton outputBrowseButton = new JButton(Resources.BROWSE_BUTTONS);
 		// add the functionality on the browse button
 		addFunctionalityOutputBrowseButton(outputBrowseButton, outputTextField);
 		GridBagConstraints gridBConstOutputBrowseButton = new GridBagConstraints();
@@ -208,37 +229,51 @@ public class DialogDesignGUI extends JDialog {
 		buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		getContentPane().add(buttonPane, BorderLayout.SOUTH);
 
-		JButton okButton = new JButton("Send");
-		okButton.setActionCommand("Send");
-		buttonPane.add(okButton);
-		getRootPane().setDefaultButton(okButton);
+		JButton sendButton = new JButton("Send");
+		addFunctionalitySendButton(sendButton);
+		sendButton.setActionCommand("Send");
+		buttonPane.add(sendButton);
+		getRootPane().setDefaultButton(sendButton);
 
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.setActionCommand("Cancel");
-		addFunctonalityCloseButton(cancelButton);
+		addFunctionalityCloseButton(cancelButton);
 		buttonPane.add(cancelButton);
 
 	}
 
-	// functionality for the input browse button
+// **************************************************
+// Private methods
+// **************************************************
+
+	/**
+	 * Creates the action listener for the input browse button Using the open dialog
+	 * from JFileChooser, opens a file from the disk or an URL from browser to be
+	 * edited Places in the inputTextFIeld the URL of the .json file
+	 * 
+	 * @param inputBrowseButton
+	 */
 	private void addFunctionalityInputBrowseButton(JButton button, JTextField textField) {
 
 		button.addActionListener(new ActionListener() {
-
+			/**
+			 * Add functionality for the inputBrowseButton, for opening a file from disk and
+			 * place the URL of the file in the text field
+			 */
 			@Override
 			public void actionPerformed(ActionEvent evt) {
 				// chooses the documents directory from hard disk
 				JFileChooser fileChooser = new JFileChooser(new File(""));
-				// we are looking for .json files
-				FileTypeFilter docFilter = new FileTypeFilter(".json", "JSON Files");
+				// we are looking only for .json files
+				FileTypeFilter docFilter = new FileTypeFilter(Resources.FILE_EXTENTION, "JSON Files");
 				fileChooser.addChoosableFileFilter(docFilter);
 				fileChooser.setDialogTitle("Select Location");
 				fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 				fileChooser.setAcceptAllFileFilterUsed(false);
-
-				if (fileChooser.showSaveDialog(contentPanel) == JFileChooser.APPROVE_OPTION) {
-					// Obtaining the url of the file. looks that is the same with the .getFullPath
-					// there is a doubt about the using of this two methods
+				// opens a JFileChooser dialog for opening a file
+				int retval = fileChooser.showOpenDialog(button);
+				if (retval == JFileChooser.APPROVE_OPTION) {
+					// Obtaining the url of the file using try and catch method.
 					try {
 						@SuppressWarnings("deprecation")
 						URL fileURL = fileChooser.getSelectedFile().toURL();
@@ -253,31 +288,161 @@ public class DialogDesignGUI extends JDialog {
 		});
 	}
 
-	// functionality for the save browse button
-	private void addFunctionalityOutputBrowseButton(JButton button, JTextField textField) {
+	/**
+	 * Creates the action listener for the output/save browse button Using the save
+	 * dialog JFileChooser chooses a file from the disk or create a new one in the
+	 * filed name Places in the outputTextField the name with the extention on the
+	 * file
+	 * 
+	 * @param outputBrowseButton
+	 */
+	private void addFunctionalityOutputBrowseButton(JButton button, JTextField textFieldOutput) {
 		button.addActionListener(new ActionListener() {
 			@Override
+			/**
+			 * Add functionality for the outputBrowseButton, for choosing a file from the
+			 * disk to store the new information of the API or creating a new one by write
+			 * the name of the new file
+			 */
 			public void actionPerformed(ActionEvent evt) {
-				// opens the doucments directory from the hardisk
-				JFileChooser fileChooser = new JFileChooser(new File(""));
-				// looks only for files with .son extension
-				FileTypeFilter docFilter = new FileTypeFilter(".json", "JSON Files");
+				JFileChooser fileChooser = new JFileChooser() {
+					/**
+					 * Here we create a panel that attention us if we want to overwrite a file from
+					 * the disk
+					 */
+					private static final long serialVersionUID = 1L;
+
+					@Override
+					public void approveSelection() {
+						File file = getSelectedFile();
+						if (file.exists() && getDialogType() == SAVE_DIALOG) {
+							int result = JOptionPane.showConfirmDialog(this, "The file exists, overwrite?",
+									"Existing file", JOptionPane.YES_NO_CANCEL_OPTION);
+							switch (result) {
+							case JOptionPane.YES_OPTION:
+								super.approveSelection();
+								return;
+							case JOptionPane.NO_OPTION:
+								return;
+							case JOptionPane.CLOSED_OPTION:
+								return;
+							case JOptionPane.CANCEL_OPTION:
+								cancelSelection();
+								return;
+							default:
+								return;
+							}
+						}
+						super.approveSelection();
+					}
+				};
+
+				// the doc filter for the file that we want to choose
+				FileTypeFilter docFilter = new FileTypeFilter(Resources.FILE_EXTENTION, "JSON Files");
 				fileChooser.addChoosableFileFilter(docFilter);
 				fileChooser.setDialogTitle("Select Location");
 				fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				fileChooser.setAcceptAllFileFilterUsed(true);
-				if (fileChooser.showSaveDialog(contentPanel) == JFileChooser.APPROVE_OPTION) {
-					// we only select the name
+
+				// the save dialog from JFileChooser
+				int retval = fileChooser.showSaveDialog(button);
+				if (retval == JFileChooser.APPROVE_OPTION) {
+					// we use a string for storing the absolute path. that helps for the
+					// verification if the file is valid.
+					outputFileAbsolutePath = fileChooser.getSelectedFile().getAbsolutePath();
 					String fileID = fileChooser.getSelectedFile().getName();
-					textField.setText(fileID);
+					int firstOccurrence = fileID.indexOf(Resources.FILE_EXTENTION);
+					// if it is created a new file we have to display the file name plus extention
+					if (firstOccurrence == -1) {
+						fileID += Resources.FILE_EXTENTION;
+					}
+					textFieldOutput.setText(fileID);
 				}
 			}
 		});
 
 	}
 
-	// functionality for the cancel button
-	private void addFunctonalityCloseButton(JButton button) {
+	/**
+	 * This method implements the functionality of the sendButton. It shows a panel
+	 * that tell us if the URL and the Output file are valid It has additional
+	 * panels if it is forgotten to place an input file or a output file
+	 * 
+	 * @param button
+	 */
+	private void addFunctionalitySendButton(JButton button) {
+		button.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+
+				// display the panel with the error message that the input file in not placed
+				if (inputTextField.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(contentPanel, "The input text box is empty.", "Major error",
+							JOptionPane.ERROR_MESSAGE);
+				} else {
+
+					// display the panel with the error message that the output file in not selected
+					if (outputTextField.getText().isEmpty()) {
+						JOptionPane.showMessageDialog(contentPanel, "The output text box is empty.", "Major error",
+								JOptionPane.ERROR_MESSAGE);
+					} else {
+						// use two methods that checks in the URL and The Output file are valid
+						String urlField = inputTextField.getText();
+						boolean flagInternetURL = verifyURLValid(urlField);
+						boolean flagOutoutFile = verifyFileExists();
+						// display the message
+						JOptionPane.showMessageDialog(contentPanel,
+								"The URL is " + flagInternetURL + " and the Output File is " + flagOutoutFile);
+					}
+				}
+			}
+		});
+
+	}
+
+	/**
+	 * Verify if the URL is valid
+	 * 
+	 * @param verifyURL
+	 * @return true if is Valid or false if is not Valid
+	 */
+	private boolean verifyURLValid(String verifyURL) {
+
+		try {
+			new URL(verifyURL).toURI();
+			return true;
+		} catch (Exception e) {
+			Path path = Paths.get(verifyURL.substring(6));
+			boolean flagFileURL = Files.exists(path);
+
+			if (flagFileURL)
+				return flagFileURL;
+
+			return false;
+
+		}
+	}
+
+	/**
+	 * Verify if the selected file is Valid
+	 * 
+	 * @param verifyFile
+	 * @return true if it is or false if isn't
+	 */
+	private boolean verifyFileExists() {
+		Path path = Paths.get(outputFileAbsolutePath);
+		boolean flagFile = Files.exists(path);
+		if (flagFile)
+			return flagFile;
+		return false;
+	}
+
+	/**
+	 * If is pressed it closes the Dialog
+	 * 
+	 * @param closeButton
+	 */
+	private void addFunctionalityCloseButton(JButton button) {
 		button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent evt) {
